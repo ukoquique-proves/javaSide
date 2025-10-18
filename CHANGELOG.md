@@ -1,4 +1,57 @@
-# Changelog - Alexia
+# Changelog - Javaside
+
+## [2025-10-18] - Despliegue en Koyeb y Mejoras de Producción
+
+### ✅ Implementado
+
+#### Despliegue en la Nube
+- ✅ **Aplicación desplegada en Koyeb**: La aplicación está ahora disponible públicamente en https://mixed-trixi-teledigitos-565be96c.koyeb.app
+- ✅ **Configuración de Docker**: Creado `Dockerfile` con build multi-etapa para optimizar el tamaño de la imagen
+- ✅ **Integración con GitHub**: Repositorio conectado para despliegues automáticos
+- ✅ **Variables de entorno**: Configuradas credenciales de Supabase en Koyeb
+
+#### Configuración de Vaadin para Producción
+- ✅ **Modo de producción**: Añadido `vaadin.productionMode=true` en `application.properties`
+- ✅ **Plugin de Maven**: Configurado `vaadin-maven-plugin` con goals `prepare-frontend` y `build-frontend` para compilar recursos del frontend
+- ✅ **Build optimizado**: El frontend de Vaadin se construye durante la fase de compilación de Maven
+
+#### Ajustes de Configuración
+- ✅ **Puerto dinámico**: Cambiado de 8080 a 8000 para compatibilidad con Koyeb
+- ✅ **Mensaje de inicio dinámico**: El mensaje de inicio ahora lee el puerto real desde la configuración de Spring Boot
+- ✅ **Arquitectura limpia**: Refactorización completa del proyecto de "Alexia" a "Javaside" siguiendo principios de Clean Code
+
+### 📦 Archivos Creados
+- `Dockerfile` - Configuración de contenedor Docker con build multi-etapa
+- `deployment/KOYEB.md` - Guía de despliegue para Koyeb
+- `deployment/README_DEPLOY.md` - Comparación de plataformas de despliegue
+- `deployment/README.md` - Índice central de documentación de despliegue
+
+### 📦 Archivos Modificados
+- `pom.xml` - Añadido `vaadin-maven-plugin` para build de producción
+- `src/main/resources/application.properties` - Configurado puerto 8000 y modo de producción de Vaadin
+- `src/main/java/com/javaside/JavasideApplication.java` - Mensaje de inicio dinámico que lee el puerto configurado
+- `README.md` - Actualizado con nueva estructura y enlaces a documentación de despliegue
+
+### 🐛 Problemas Resueltos
+
+1. **Error de modo desarrollo de Vaadin**: La aplicación intentaba ejecutarse en modo desarrollo en producción
+   - **Solución**: Añadido `vaadin.productionMode=true` y configurado el plugin de Maven
+
+2. **Mismatch de puerto**: La aplicación corría en 8080 pero Koyeb esperaba 8000
+   - **Solución**: Cambiado `server.port=8000` en application.properties
+
+3. **Recursos de frontend faltantes**: Error 500 por falta de bundle de Vaadin
+   - **Solución**: Configurado `vaadin-maven-plugin` para construir el frontend durante el build
+
+### ✅ Resultado
+
+- La aplicación está **completamente funcional** en producción
+- Accesible públicamente en: https://mixed-trixi-teledigitos-565be96c.koyeb.app
+- Conectada a base de datos Supabase PostgreSQL
+- Dashboard profesional con prueba de conexión funcionando
+- Logs de inicio muestran el puerto correcto dinámicamente
+
+---
 
 ## [2025-10-18] - Configuración de Entorno de Mocking y Corrección de Conexión
 

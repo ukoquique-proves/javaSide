@@ -44,12 +44,24 @@ This section provides a detailed comparison of different cloud platforms and exp
 
 ## Final Decision
 
-For its combination of an integrated free database, ease of use, and excellent developer experience, **Render is the clear winner** and the recommended platform for deploying the Javaside application.
+While Render offers an integrated database solution, **Koyeb was chosen for this deployment** due to its excellent Docker support and seamless GitHub integration. The application is successfully deployed and running at:
+
+**Live URL**: https://mixed-trixi-teledigitos-565be96c.koyeb.app
 
 ## Deployment Instructions
 
 Choose a platform from the list below and follow the corresponding guide for step-by-step deployment instructions.
 
-- **[Koyeb](./KOYEB.md)**: Our current recommended platform. This guide explains how to deploy the application using Docker and connect it to a Supabase database.
+- **[Koyeb](./KOYEB.md)**: ✅ **Currently deployed**. This guide explains how to deploy the application using Docker and connect it to a Supabase database.
 
-- **Render**: (Guide to be created if needed). Render was our initial choice, and a `render.yaml` file can be quickly generated if we decide to use it in the future.
+- **Render**: Alternative option with integrated database. A `render.yaml` file can be quickly generated if needed in the future.
+
+## Current Deployment Status
+
+- **Platform**: Koyeb
+- **Status**: ✅ Healthy and Running
+- **URL**: https://mixed-trixi-teledigitos-565be96c.koyeb.app
+- **Database**: Supabase PostgreSQL (external)
+- **Port**: 8000
+- **Container**: Docker with multi-stage build
+- **Frontend**: Vaadin production mode with pre-built bundle
