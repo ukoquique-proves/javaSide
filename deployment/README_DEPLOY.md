@@ -54,7 +54,7 @@ Choose a platform from the list below and follow the corresponding guide for ste
 
 - **[Koyeb](./KOYEB.md)**: ✅ **Currently deployed**. This guide explains how to deploy the application using Docker and connect it to a Supabase database.
 
-- **Render**: Alternative option with integrated database. A `render.yaml` file can be quickly generated if needed in the future.
+- **[Render](./RENDER.md)**: ✅ **Ready to deploy**. Complete guide with `render.yaml` configuration included. Supports automatic port detection.
 
 ## Current Deployment Status
 
@@ -143,6 +143,8 @@ IllegalStateException: Directory '/app' does not look like a Maven or Gradle pro
 ```properties
 server.port=${PORT:8080}
 ```
+
+**✅ This project now uses dynamic port configuration**: `server.port=${PORT:8000}` - automatically adapts to any platform.
 
 ### 4. Dynamic Port Message Issue ⚠️
 
