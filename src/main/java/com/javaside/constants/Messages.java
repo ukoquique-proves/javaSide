@@ -16,8 +16,8 @@ public final class Messages {
     public static final String CONNECTION_TESTING = "Probando conexión...";
     
     // Mensajes del sistema
-    public static final String SYSTEM_STARTED = "✓ Alexia Application Started Successfully!";
-    public static final String DASHBOARD_AVAILABLE = "✓ Dashboard available at: http://localhost:8080";
+    public static final String SYSTEM_STARTED = "✓ Javaside Application Started Successfully!";
+    public static final String DASHBOARD_AVAILABLE = "✓ Dashboard available at: http://localhost:{port}";
     
     // Mensajes de estado
     public static final String STATUS_ACTIVE = "Activo";
