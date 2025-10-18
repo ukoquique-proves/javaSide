@@ -28,7 +28,7 @@ WORKDIR /app
 COPY --from=build /app/target/javaside-1.0.0.jar ./app.jar
 
 # Expose the port the application runs on
-EXPOSE 8080
+EXPOSE 8000
 
 # Set the command to run the application
 # The database credentials will be passed as environment variables by Render
