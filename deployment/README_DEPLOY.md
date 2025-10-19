@@ -190,28 +190,58 @@ System.out.println("✓ Dashboard available at: http://localhost:" + port);
 
 ### Deploying to Render
 
-**Known Issues with Render**:
+**✅ Currently Deployed Platform** - See [RENDER.md](./RENDER.md) for complete guide.
 
-1. **Automatic Port Detection**: Render sets a `PORT` environment variable. Your application must read from it:
+**Critical Requirements**:
+
+1. **Database Format Conversion (REQUIRED)**: Render provides PostgreSQL URL in native format, but Spring Boot requires JDBC format:
+   ```bash
+   # ❌ Render gives you this (PostgreSQL native):
+   postgresql://user:password@dpg-xxxxx-a/database
+   
+   # ✅ You MUST convert to JDBC format:
+   jdbc:postgresql://dpg-xxxxx-a/database
+   # Then set user and password separately:
+   DATABASE_USER=user
+   DATABASE_PASSWORD=password
+   ```
+
+2. **Free Tier Database Restrictions**:
+   - ❌ **CANNOT connect to external databases** (Supabase, AWS RDS, etc.)
+   - ✅ **MUST use Render PostgreSQL** for free tier
+   - ⚠️ Only **ONE free database** allowed per account
+   - See [RENDER.md - Error #1](./RENDER.md#-error-1-intentar-usar-supabase-en-free-tier) for details
+
+3. **Variable Naming Convention**:
+   - ✅ Use `DATABASE_*` variables in production (Render)
+   - ❌ Do NOT use `SUPABASE_DB_*` variables (will try to connect to Supabase)
+   - See [RENDER.md - Error #3](./RENDER.md#-error-3-usar-supabase_db_-en-lugar-de-database_) for details
+
+4. **Automatic Port Detection**: Render sets a `PORT` environment variable. Your application must read from it:
    ```properties
-   server.port=${PORT:10000}
+   server.port=${PORT:8000}
    ```
 
-2. **Build Command**: Render may require explicit build commands in `render.yaml`:
-   ```yaml
-   buildCommand: mvn clean install -DskipTests
-   ```
+5. **Vaadin Production Mode**: Ensure `vaadin.productionMode=true` and the Maven plugin is configured.
 
-3. **Vaadin Production Mode**: Same issue as Koyeb. Ensure `vaadin.productionMode=true` and the Maven plugin is configured.
+**Common Deployment Failures**:
+- **Error #1**: Attempting to use Supabase on free tier → Network restrictions block connection
+- **Error #2**: Misconfigured environment variables → App fails to start
+- **Error #3**: Using `SUPABASE_DB_*` instead of `DATABASE_*` → Connects to wrong database
+- **Error #4**: Incorrect JDBC URL format → Driver not found
+- **Error #5**: Multiple free tier databases → Cannot create new database
 
-4. **Database Connection**: If using Render's managed PostgreSQL, the connection string format may differ slightly. Verify the JDBC URL format.
+**Full troubleshooting guide**: See [RENDER.md - Lecciones Aprendidas](./RENDER.md#️-lecciones-aprendidas-por-qué-fallan-los-despliegues-en-render)
 
 **Render Deployment Checklist**:
 - [ ] `vaadin.productionMode=true` in `application.properties`
 - [ ] `vaadin-maven-plugin` configured in `pom.xml`
-- [ ] `server.port=${PORT:10000}` for dynamic port binding
+- [ ] `server.port=${PORT:8000}` for dynamic port binding
+- [ ] Database URL converted to JDBC format (`jdbc:postgresql://...`)
+- [ ] Using `DATABASE_*` variables (NOT `SUPABASE_DB_*`)
+- [ ] Only one free tier database in account
 - [ ] `render.yaml` with correct build and start commands
-- [ ] Environment variables set for database connection
+- [ ] Environment variables set and SAVED in Render dashboard
 
 ### Deploying to GCP Cloud Run
 
