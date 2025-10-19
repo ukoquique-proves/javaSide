@@ -28,6 +28,7 @@ public class JavasideApplication {
     /**
      * Carga las variables de entorno desde el archivo .env antes de que Spring inicie.
      * Esto es crítico para que las propiedades de conexión a la base de datos se resuelvan correctamente.
+     * Nota: Las variables de entorno del sistema (Render, Railway, etc.) tienen prioridad sobre .env
      */
     private static void loadEnvironmentVariables() {
         try {
@@ -35,14 +36,22 @@ public class JavasideApplication {
                     .ignoreIfMissing()
                     .load();
             
-            dotenv.entries().forEach(entry -> {
-                System.setProperty(entry.getKey(), entry.getValue());
-            });
+            int loadedCount = 0;
+            for (var entry : dotenv.entries()) {
+                // Solo cargar si la variable NO existe ya en el sistema
+                if (System.getenv(entry.getKey()) == null) {
+                    System.setProperty(entry.getKey(), entry.getValue());
+                    loadedCount++;
+                }
+            }
             
-            System.out.println("✓ Variables de entorno cargadas desde .env");
+            if (loadedCount > 0) {
+                System.out.println("✓ Variables de entorno cargadas desde .env (desarrollo local)");
+            } else {
+                System.out.println("✓ Usando variables de entorno del sistema (producción)");
+            }
         } catch (Exception e) {
-            System.out.println("⚠ No se pudo cargar .env: " + e.getMessage());
-            System.out.println("  Usando variables de entorno del sistema");
+            System.out.println("✓ Usando variables de entorno del sistema");
         }
     }
 }
