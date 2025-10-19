@@ -243,6 +243,237 @@ Once deployment is complete, Render will provide a public URL like:
 
 ---
 
+## ⚠️ Lecciones Aprendidas: Por Qué Fallan los Despliegues en Render
+
+Esta sección documenta errores comunes que causan fallos en el despliegue, basados en experiencias reales con este proyecto.
+
+### 🚫 Error #1: Intentar Usar Supabase en Free Tier
+
+**Problema Común:**
+```
+Error: Connection refused
+Network is unreachable
+Could not connect to database
+```
+
+**Causa Raíz:**
+- El **free tier de Render NO puede conectarse a bases de datos externas** como Supabase
+- Render free tier tiene restricciones de red que bloquean conexiones salientes a servicios externos
+- Esto incluye Supabase, AWS RDS, Google Cloud SQL, etc.
+
+**Síntomas:**
+- ✅ Build exitoso
+- ✅ Contenedor inicia correctamente
+- ❌ Aplicación falla al conectarse a la base de datos
+- ❌ Logs muestran "Connection refused" o "Network unreachable"
+- ❌ Health checks fallan
+
+**Solución:**
+1. **Usar Render PostgreSQL** (opción recomendada)
+2. **Upgrade a plan pago** ($7/mes) para acceso a bases de datos externas
+3. **Intentar Connection Pooler** de Supabase (60-70% éxito)
+
+**Prevención:**
+```bash
+# ❌ NO USAR en Render Free Tier:
+DATABASE_URL=jdbc:postgresql://db.xxxxx.supabase.co:5432/postgres
+
+# ✅ USAR en Render Free Tier:
+DATABASE_URL=jdbc:postgresql://dpg-xxxxx-a/javaside  # Render PostgreSQL
+```
+
+---
+
+### 🚫 Error #2: Variables de Entorno Mal Configuradas
+
+**Problema Común:**
+```
+Error: Could not resolve placeholder 'DATABASE_URL'
+Application failed to start
+```
+
+**Causa Raíz:**
+- Variables de entorno no configuradas en el dashboard de Render
+- Nombres de variables incorrectos (mayúsculas/minúsculas)
+- Variables configuradas pero no guardadas
+
+**Síntomas:**
+- ✅ Build exitoso
+- ❌ Aplicación falla al iniciar
+- ❌ Logs muestran "placeholder" errors
+- ❌ Spring Boot no puede resolver propiedades
+
+**Solución:**
+1. Ir a Render Dashboard → Tu servicio → **Environment**
+2. Verificar que TODAS las variables estén configuradas:
+   ```
+   DATABASE_URL
+   DATABASE_USER
+   DATABASE_PASSWORD
+   ```
+3. Click **Save Changes** (importante!)
+4. Redeploy manual si es necesario
+
+**Prevención:**
+- Usar el archivo `.env.render` como referencia
+- Copiar y pegar valores exactos (sin espacios extra)
+- Verificar que `render.yaml` liste todas las variables necesarias
+
+---
+
+### 🚫 Error #3: Usar SUPABASE_DB_* en Lugar de DATABASE_*
+
+**Problema Común:**
+```
+Application starts but cannot connect to Render database
+```
+
+**Causa Raíz:**
+- El proyecto está configurado con fallback: `${DATABASE_URL:${SUPABASE_DB_URL}}`
+- Si configuras `SUPABASE_DB_URL` con credenciales de Supabase, la app intentará conectarse a Supabase (que falla en free tier)
+- Render PostgreSQL requiere usar variables `DATABASE_*`
+
+**Síntomas:**
+- ✅ Build exitoso
+- ✅ Aplicación inicia
+- ❌ Conexión a base de datos falla
+- ❌ Logs muestran intento de conexión a Supabase
+
+**Solución:**
+```bash
+# ❌ INCORRECTO (intentará conectarse a Supabase):
+SUPABASE_DB_URL=jdbc:postgresql://db.xxxxx.supabase.co:5432/postgres
+SUPABASE_DB_USER=postgres
+SUPABASE_DB_PASSWORD=tu_password
+
+# ✅ CORRECTO (usa Render PostgreSQL):
+DATABASE_URL=jdbc:postgresql://dpg-xxxxx-a/javaside
+DATABASE_USER=javaside
+DATABASE_PASSWORD=render_password
+```
+
+**Prevención:**
+- **Siempre usar `DATABASE_*` en producción**
+- Reservar `SUPABASE_DB_*` solo para desarrollo local
+- Verificar logs para confirmar qué base de datos se está usando
+
+---
+
+### 🚫 Error #4: Formato JDBC Incorrecto
+
+**Problema Común:**
+```
+Invalid database URL format
+Could not load driver class
+```
+
+**Causa Raíz:**
+- Usar formato PostgreSQL nativo en lugar de JDBC
+- Incluir usuario/password en la URL (no compatible con Spring Boot)
+
+**Síntomas:**
+- ❌ Aplicación falla al iniciar
+- ❌ Logs muestran "Invalid URL" o "Driver not found"
+
+**Solución:**
+```bash
+# ❌ INCORRECTO (formato PostgreSQL nativo):
+DATABASE_URL=postgresql://javaside:password@dpg-xxxxx-a/javaside
+
+# ✅ CORRECTO (formato JDBC):
+DATABASE_URL=jdbc:postgresql://dpg-xxxxx-a/javaside
+DATABASE_USER=javaside
+DATABASE_PASSWORD=password
+```
+
+**Conversión:**
+```
+De:  postgresql://user:pass@host/database
+A:   jdbc:postgresql://host/database
+     + DATABASE_USER=user
+     + DATABASE_PASSWORD=pass
+```
+
+---
+
+### 🚫 Error #5: Múltiples Bases de Datos Free Tier
+
+**Problema Común:**
+```
+Error: cannot have more than one active free tier database
+```
+
+**Causa Raíz:**
+- Render free tier permite **solo UNA base de datos PostgreSQL gratuita** por cuenta
+- Intentar crear una segunda base de datos falla
+
+**Síntomas:**
+- ❌ No puedes crear nueva base de datos
+- ❌ Error al intentar provisionar PostgreSQL
+
+**Solución:**
+1. **Eliminar base de datos no usada:**
+   - Dashboard → Base de datos antigua → Settings → Delete Database
+2. **Reutilizar base de datos existente:**
+   - Usar credenciales de la base de datos que ya tienes
+3. **Upgrade a plan pago:**
+   - $7/mes permite múltiples bases de datos
+
+---
+
+## ✅ Checklist de Despliegue Exitoso
+
+Usa esta lista para evitar errores comunes:
+
+### Antes de Desplegar
+- [ ] Decidir: ¿Usar Render PostgreSQL o Supabase?
+  - Free tier → **Render PostgreSQL obligatorio**
+  - Plan pago → Puedes usar Supabase
+- [ ] Verificar que solo tienes UNA base de datos free tier activa
+- [ ] Confirmar formato JDBC correcto en variables
+
+### Durante la Configuración
+- [ ] Crear base de datos PostgreSQL en Render PRIMERO
+- [ ] Copiar credenciales exactas (hostname, database, user, password)
+- [ ] Convertir URL a formato JDBC
+- [ ] Configurar variables `DATABASE_*` (NO `SUPABASE_DB_*`)
+- [ ] Guardar cambios en Render dashboard
+
+### Verificación Post-Despliegue
+- [ ] Build completado sin errores
+- [ ] Logs muestran: "✓ Usando variables de entorno del sistema (producción)"
+- [ ] Logs muestran: "✓ Conexión exitosa a PostgreSQL"
+- [ ] Health checks pasan (indicador verde)
+- [ ] URL pública accesible
+- [ ] Dashboard carga correctamente
+- [ ] Botón "Probar Conexión a BD" funciona
+
+---
+
+## 🎯 Recomendaciones Finales
+
+### Para Free Tier
+1. **SIEMPRE usa Render PostgreSQL** - No intentes conectar a Supabase
+2. **Usa variables `DATABASE_*`** - No uses `SUPABASE_DB_*`
+3. **Verifica formato JDBC** - Debe empezar con `jdbc:postgresql://`
+4. **Una sola base de datos** - Elimina las que no uses
+
+### Para Plan Pago ($7/mes)
+1. Puedes usar Supabase directamente
+2. Múltiples bases de datos permitidas
+3. Sin restricciones de red
+4. Sin sleep después de inactividad
+
+### Migración de Supabase a Render
+Si ya tienes datos en Supabase:
+1. Exportar datos: `pg_dump` desde Supabase
+2. Crear base de datos en Render
+3. Importar datos: `psql` a Render PostgreSQL
+4. Actualizar variables de entorno
+5. Redeploy
+
+---
+
 ## Troubleshooting
 
 ### Build Fails or Takes Too Long
