@@ -50,6 +50,8 @@ nbdist/
 
 # Environment variables
 .env
+.env.render
+.env.local
 
 # OS
 .DS_Store

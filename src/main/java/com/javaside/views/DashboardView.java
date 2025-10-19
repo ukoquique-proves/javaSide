@@ -122,7 +122,7 @@ public class DashboardView extends VerticalLayout {
         statusRow.setSpacing(true);
 
         statusRow.add(
-            createStatusBadge("Supabase", true),
+            createStatusBadge("PostgreSQL", true),
             createStatusBadge("Telegram", false),
             createStatusBadge("WhatsApp", false),
             createStatusBadge("OpenAI/Grok", false),
@@ -130,7 +130,7 @@ public class DashboardView extends VerticalLayout {
         );
 
         // Botón de prueba de conexión
-        Button testButton = new Button("Probar Conexión a Supabase", VaadinIcon.REFRESH.create());
+        Button testButton = new Button("Probar Conexión a BD", VaadinIcon.REFRESH.create());
         testButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         testButton.addClickListener(e -> {
             ConnectionResultDTO result = testConnectionUseCase.execute();

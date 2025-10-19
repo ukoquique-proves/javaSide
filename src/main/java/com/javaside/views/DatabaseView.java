@@ -16,8 +16,8 @@ public class DatabaseView extends VerticalLayout {
         setPadding(true);
 
         H2 title = new H2(VaadinIcon.DATABASE.create(), new com.vaadin.flow.component.html.Span(" Base de Datos"));
-        Paragraph description = new Paragraph("Gestión y monitoreo de la base de datos Supabase. Visualiza tablas, estadísticas y estado de conexión.");
-        Paragraph status = new Paragraph("✅ Conexión a Supabase funcionando - Paso 2 completado");
+        Paragraph description = new Paragraph("Gestión y monitoreo de la base de datos PostgreSQL. Visualiza tablas, estadísticas y estado de conexión.");
+        Paragraph status = new Paragraph("✅ Conexión a PostgreSQL funcionando - Paso 2 completado");
         status.getStyle().set("color", "#4CAF50");
 
         add(title, description, status);

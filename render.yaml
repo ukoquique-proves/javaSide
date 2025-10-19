@@ -4,9 +4,13 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: SUPABASE_DB_URL
+      - key: DATABASE_URL
         sync: false
-      - key: SUPABASE_DB_USER
+      - key: DATABASE_USER
         sync: false
-      - key: SUPABASE_DB_PASSWORD
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: GROK_API_KEY
         sync: false

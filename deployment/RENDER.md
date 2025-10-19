@@ -41,44 +41,141 @@ Render will automatically detect the `Dockerfile` and `render.yaml` in your repo
 
 ### Step 5: Set Up Database
 
-**Important**: Render's free tier cannot connect to external databases like Supabase due to network restrictions. You have two options:
+**Important**: Render's free tier:
+- ✅ **CAN** connect to Render's own PostgreSQL databases (internal network)
+- ❌ **CANNOT** connect to external databases like Supabase (network restrictions)
+- ⚠️ **Free tier allows only ONE free PostgreSQL database per account**
 
-#### Option A: Use Render Managed PostgreSQL (Recommended for Free Tier)
+---
 
-1. **Create PostgreSQL Database**:
-   - In Render Dashboard → **New +** → **PostgreSQL**
+#### Option A: Use Render Managed PostgreSQL (Recommended) ⭐
+
+**Step 5.1: Create PostgreSQL Database**
+
+1. In Render Dashboard → **New +** → **PostgreSQL**
+2. Configure:
    - **Name**: `javaside-db`
    - **Database**: `javaside`
-   - **User**: `javaside`
-   - **Region**: Same as your web service
-   - **PostgreSQL Version**: 16
-   - **Plan**: **Free**
-   - Click **Create Database**
+   - **User**: `javaside` (auto-generated)
+   - **Region**: **Oregon (US West)** (same as web service for low latency)
+   - **PostgreSQL Version**: **16**
+   - **Plan**: **Free** (90 days free, then $7/month)
+3. Click **Create Database**
+4. Wait 2-3 minutes for provisioning
 
-2. **Get Connection Details**:
-   - Once created, copy the **Internal Database URL**
-   - Format: `postgresql://user:password@host/database`
-   - Example: `postgresql://javaside_user:abc123@dpg-xxxxx-a/javaside_db`
+**Step 5.2: Get Connection Details**
 
-3. **Convert to JDBC Format**:
-   - From: `postgresql://user:password@host/database`
-   - To: `jdbc:postgresql://host/database`
-   - Example: `jdbc:postgresql://dpg-xxxxx-a/javaside_db`
+Once created, you'll see the **Internal Database URL**:
 
-4. **Add Environment Variables**:
-   Click **Advanced** in your web service and add:
+```
+postgresql://javaside:Ir7hgbg4hTPiksD69TIRd2GRwhnApSDZ@dpg-d3qemls9c44c73cn3760-a/javaside
+```
 
-   | Key | Value |
-   | :--- | :--- |
-   | `SUPABASE_DB_URL` | `jdbc:postgresql://[internal-host]/[database-name]` |
-   | `SUPABASE_DB_USER` | `[database-user]` |
-   | `SUPABASE_DB_PASSWORD` | `[database-password]` |
+**Breakdown:**
+- **Hostname**: `dpg-d3qemls9c44c73cn3760-a`
+- **Database**: `javaside`
+- **Username**: `javaside`
+- **Password**: `Ir7hgbg4hTPiksD69TIRd2GRwhnApSDZ`
 
-5. **Database Table Creation**:
-   - Hibernate will auto-create tables with `spring.jpa.hibernate.ddl-auto=update`
-   - Or manually run SQL from `database/step2_connection_test.sql`
+**Step 5.3: Convert to JDBC Format**
 
-#### Option B: Use Supabase Connection Pooler (May Work)
+Spring Boot requires JDBC format:
+
+```
+From: postgresql://javaside:password@dpg-xxxxx-a/javaside
+To:   jdbc:postgresql://dpg-xxxxx-a/javaside
+```
+
+**Example for this project:**
+```
+jdbc:postgresql://dpg-d3qemls9c44c73cn3760-a/javaside
+```
+
+**Step 5.4: Configure Environment Variables**
+
+The project uses **flexible variable names** that support multiple database providers:
+
+**Primary Variables (Recommended for Render):**
+```bash
+DATABASE_URL = jdbc:postgresql://dpg-d3qemls9c44c73cn3760-a/javaside
+DATABASE_USER = javaside
+DATABASE_PASSWORD = Ir7hgbg4hTPiksD69TIRd2GRwhnApSDZ
+```
+
+**Fallback Variables (Legacy Supabase support):**
+```bash
+SUPABASE_DB_URL = jdbc:postgresql://dpg-d3qemls9c44c73cn3760-a/javaside
+SUPABASE_DB_USER = javaside
+SUPABASE_DB_PASSWORD = Ir7hgbg4hTPiksD69TIRd2GRwhnApSDZ
+```
+
+**How it works:**
+The `application.properties` file uses this configuration:
+```properties
+spring.datasource.url=${DATABASE_URL:${SUPABASE_DB_URL}}
+spring.datasource.username=${DATABASE_USER:${SUPABASE_DB_USER}}
+spring.datasource.password=${DATABASE_PASSWORD:${SUPABASE_DB_PASSWORD}}
+```
+
+This means:
+- ✅ Try `DATABASE_URL` first (generic)
+- ✅ If not found, fallback to `SUPABASE_DB_URL`
+- ✅ Works with Render, Railway, Fly.io, or any PostgreSQL provider
+
+**Step 5.5: Add Variables to Render Web Service**
+
+When creating your Web Service, in the **Environment Variables** section, add:
+
+| Key | Value |
+| :--- | :--- |
+| `DATABASE_URL` | `jdbc:postgresql://dpg-d3qemls9c44c73cn3760-a/javaside` |
+| `DATABASE_USER` | `javaside` |
+| `DATABASE_PASSWORD` | `Ir7hgbg4hTPiksD69TIRd2GRwhnApSDZ` |
+| `TELEGRAM_BOT_TOKEN` | `<your-telegram-bot-token>` |
+| `GROK_API_KEY` | `<your-grok-api-key>` |
+
+**Step 5.6: Database Table Creation**
+
+Tables are created automatically:
+- ✅ Hibernate auto-creates tables with `spring.jpa.hibernate.ddl-auto=update`
+- ✅ On first connection, `connection_test` table will be created
+- ✅ No manual SQL execution needed
+
+**Optional:** To manually create tables, connect via `psql` and run:
+```sql
+-- From database/step2_connection_test.sql
+CREATE TABLE connection_test (
+    id SERIAL PRIMARY KEY,
+    message VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+---
+
+#### Option B: If You Already Have a Render PostgreSQL Database
+
+**Error:** `cannot have more than one active free tier database`
+
+**Solutions:**
+
+1. **Delete unused database:**
+   - Dashboard → Select old database → Settings → Delete Database
+   - Then create new one for Javaside
+
+2. **Reuse existing database:**
+   - Use the existing database credentials
+   - Update environment variables with those credentials
+
+3. **Upgrade to paid plan:**
+   - $7/month allows multiple databases
+   - No free tier restrictions
+
+---
+
+#### Option C: Use Supabase Connection Pooler (Not Recommended)
+
+⚠️ **Success rate: ~60-70% on Render free tier** - Network restrictions may block connection
 
 1. **Get Pooler URL from Supabase**:
    - Go to Supabase → **Settings** → **Database** → **Connection Pooling**
@@ -92,21 +189,21 @@ Render will automatically detect the `Dockerfile` and `render.yaml` in your repo
 3. **Add Environment Variables**:
    | Key | Value |
    | :--- | :--- |
-   | `SUPABASE_DB_URL` | `jdbc:postgresql://[pooler-host]:6543/postgres` |
-   | `SUPABASE_DB_USER` | `postgres` |
-   | `SUPABASE_DB_PASSWORD` | `[your-password]` |
+   | `DATABASE_URL` | `jdbc:postgresql://[pooler-host]:6543/postgres` |
+   | `DATABASE_USER` | `postgres` |
+   | `DATABASE_PASSWORD` | `[your-password]` |
 
-**Note**: Connection pooler success rate is ~60-70% on Render free tier.
+---
 
-#### Option C: Use External Supabase (Paid Render Plans Only)
+#### Option D: Use External Supabase (Paid Render Plans Only)
 
-Paid Render plans have full network access and can connect directly to Supabase:
+Paid Render plans ($7+/month) have full network access and can connect directly to Supabase:
 
 | Key | Value |
 | :--- | :--- |
-| `SUPABASE_DB_URL` | `jdbc:postgresql://db.xxxxx.supabase.co:5432/postgres` |
-| `SUPABASE_DB_USER` | `postgres` |
-| `SUPABASE_DB_PASSWORD` | `[your-password]` |
+| `DATABASE_URL` | `jdbc:postgresql://db.xxxxx.supabase.co:5432/postgres` |
+| `DATABASE_USER` | `postgres` |
+| `DATABASE_PASSWORD` | `[your-password]` |
 
 **Important Notes**:
 - Render automatically sets the `PORT` environment variable

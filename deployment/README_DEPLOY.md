@@ -28,17 +28,38 @@ This section provides a detailed comparison of different cloud platforms and exp
 
 - **Why it's #2**: Koyeb is also extremely easy to use and offers a great free tier for web services. However, it loses the top spot because its free tier **does not include a managed database**. We would need to connect to an external database (like Supabase), which adds a small amount of complexity compared to Render's integrated solution.
 
-### 3. Google Cloud Platform (GCP) - Cloud Run
+### 3. Linode (Akamai) - Recommended Alternative
 
-**GCP is a powerful option but is more complex than developer-focused platforms.**
+**Linode is an IaaS (Infrastructure as a Service) provider that offers a free trial without requiring a credit card.**
 
-- **Why it's #3**: GCP's "Always Free" tier is generous, and Cloud Run is an excellent serverless platform for running containers. However, the setup is significantly more involved. It requires managing IAM permissions, project configurations, and potentially a separate Cloud SQL database instance. While powerful, this complexity makes it less attractive for quick, simple deployments.
+- **Why it's a good alternative**: While platforms like Render or Koyeb (PaaS) are simpler, Linode provides a full virtual server (IaaS). This gives us complete control to install Docker and configure the environment manually. Most importantly, their free trial signup process does not mandate a credit card, making it the most accessible option.
+- **Complexity**: It's more hands-on than a PaaS. We are responsible for setting up the server, installing dependencies (like Docker), and managing the firewall.
 
-### 4. Azure / Oracle Cloud (Least Attractive)
+### 4. alwaysdata
 
-**These platforms are powerful but are overkill and too complex for this project's needs.**
+**alwaysdata is a hosting platform that supports Java and does not require a credit card, but has significant limitations.**
 
-- **Why they are last**: Azure and Oracle Cloud are enterprise-grade platforms. While their free tiers can be generous (especially Oracle's "Always Free" VMs), they come with the steepest learning curve and the most complex setup process. Navigating their dashboards, networking, and security rules is far more work than is necessary for a project of this scale, making them the least attractive options for rapid and easy deployment.
+- **Pros**: It offers a free tier without requiring a credit card for signup and supports multiple Java versions.
+- **Cons**: The free plan **does not support Docker**. This means we would need to deploy the application as a standard Java process, not as a container, which would require a different deployment strategy.
+
+### 5. domcloud.co
+
+**domcloud.co is another platform that does not require a credit card but also does not support Docker on its free plan.**
+
+- **Pros**: No credit card required for signup.
+- **Cons**: Docker support is only available on paid plans. The free plan also has a restrictive firewall that would likely block the connection to our external Supabase database.
+
+### 6. Google Cloud Platform (GCP) - Cloud Run
+
+**GCP is powerful but requires a credit card for its free tier, making it unsuitable for this project's constraints.**
+
+- **Why it's #4**: Although Cloud Run has a generous "Always Free" tier, it requires a billing account to be set up, which involves providing a credit card. This was a deal-breaker.
+
+### 5. Azure / Oracle Cloud (Least Attractive)
+
+**These platforms are enterprise-grade and far too complex for this project's needs.**
+
+- **Why they are last**: Similar to GCP, they often require billing information. Their complexity, steep learning curve, and enterprise focus make them the least suitable options for a quick and simple deployment.
 
 ---
 

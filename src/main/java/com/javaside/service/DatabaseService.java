@@ -36,7 +36,7 @@ public class DatabaseService {
             ConnectionTest test = new ConnectionTest(testMessage);
             ConnectionTest saved = connectionTestRepository.save(test);
             
-            log.info("Conexión exitosa a Supabase. Registro guardado con ID: {}", saved.getId());
+            log.info("Conexión exitosa a PostgreSQL. Registro guardado con ID: {}", saved.getId());
             
             // Contar registros totales
             long count = connectionTestRepository.count();
@@ -48,7 +48,7 @@ public class DatabaseService {
             );
             
         } catch (Exception e) {
-            log.error("Error al conectar con Supabase: {}", e.getMessage());
+            log.error("Error al conectar con PostgreSQL: {}", e.getMessage());
             return ConnectionResultDTO.error(e.getMessage());
         }
     }

@@ -11,9 +11,10 @@ public final class Messages {
     }
     
     // Mensajes de conexión
-    public static final String CONNECTION_SUCCESS = "✓ Conexión exitosa a Supabase!";
+    public static final String CONNECTION_SUCCESS = "✓ Conexión exitosa a la base de datos!";
     public static final String CONNECTION_ERROR = "✗ Error de conexión: ";
     public static final String CONNECTION_TESTING = "Probando conexión...";
+    public static final String DB_PROVIDER_NAME = "PostgreSQL"; // Supabase, Render, Railway, etc.
     
     // Mensajes del sistema
     public static final String SYSTEM_STARTED = "✓ Javaside Application Started Successfully!";
