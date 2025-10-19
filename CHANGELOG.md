@@ -1,5 +1,70 @@
 # Changelog - Javaside
 
+## [2025-10-19] - Despliegue Exitoso en Render con PostgreSQL
+
+### ✅ Implementado
+
+#### Despliegue en Producción
+- ✅ **Aplicación desplegada en Render**: https://javaside.onrender.com
+- ✅ **Base de datos PostgreSQL de Render**: Migración completa desde Supabase
+- ✅ **Auto-deploy desde GitHub**: Repositorio https://github.com/ukoquique-proves/javaSide
+- ✅ **Variables de entorno configuradas**: DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD
+- ✅ **Estado**: Live y funcionando correctamente
+
+#### Abstracción de Base de Datos
+- ✅ **Configuración flexible multi-proveedor**: Soporte para DATABASE_* y SUPABASE_DB_* variables
+- ✅ **Fallback inteligente**: `${DATABASE_URL:${SUPABASE_DB_URL}}` en application.properties
+- ✅ **Código desacoplado**: Sin referencias hardcodeadas a proveedores específicos
+- ✅ **Mensajes genéricos**: Cambiado "Supabase" a "PostgreSQL" en toda la aplicación
+
+#### Mejoras de Logging
+- ✅ **Detección de entorno**: Distingue entre desarrollo local (.env) y producción (variables del sistema)
+- ✅ **Mensajes claros**: 
+  - "Variables de entorno cargadas desde .env (desarrollo local)"
+  - "Usando variables de entorno del sistema (producción)"
+- ✅ **Prevención de confusión**: Evita mensajes engañosos en logs de producción
+
+### 📦 Archivos Creados
+- `.env.render` - Credenciales de Render PostgreSQL para referencia
+- `deployment/RENDER.md` - Guía completa de despliegue en Render (actualizada)
+
+### 📦 Archivos Modificados
+- `src/main/resources/application.properties` - Soporte para variables DATABASE_* con fallback
+- `src/main/java/com/javaside/JavasideApplication.java` - Mejora en detección de entorno
+- `src/main/java/com/javaside/constants/Messages.java` - Mensajes genéricos
+- `src/main/java/com/javaside/service/DatabaseService.java` - Referencias a PostgreSQL
+- `src/main/java/com/javaside/views/DashboardView.java` - UI con texto genérico
+- `src/main/java/com/javaside/views/DatabaseView.java` - Descripción genérica
+- `render.yaml` - Variables DATABASE_* en lugar de SUPABASE_*
+- `.gitignore` - Excluye .env y .env.render
+- `README.md` - Estado de producción y enlaces actualizados
+- `deployment/README_DEPLOY.md` - Actualizado con información de Render
+
+### 🔧 Configuración de Render
+
+**Base de Datos:**
+- Hostname: `dpg-d3qemls9c44c73cn3760-a`
+- Database: `javaside`
+- User: `javaside`
+- Plan: Free (90 días, luego $7/mes)
+
+**Web Service:**
+- URL: https://javaside.onrender.com
+- Environment: Docker
+- Region: Oregon (US West)
+- Auto-deploy: Activado
+- Plan: Free (con sleep después de 15 min inactividad)
+
+### ✅ Resultado
+
+- Aplicación **100% funcional** en producción
+- Base de datos **completamente abstraída** - compatible con cualquier PostgreSQL
+- Código **sin duplicación** ni lógicas redundantes
+- Despliegue **automatizado** desde GitHub
+- Logs **claros y precisos** según el entorno
+
+---
+
 ## [2025-10-18] - Despliegue en Koyeb y Mejoras de Producción
 
 ### ✅ Implementado

@@ -65,27 +65,28 @@ This section provides a detailed comparison of different cloud platforms and exp
 
 ## Final Decision
 
-While Render offers an integrated database solution, **Koyeb was chosen for this deployment** due to its excellent Docker support and seamless GitHub integration. The application is successfully deployed and running at:
+**Render was chosen for this deployment** due to its integrated PostgreSQL database solution and excellent developer experience. The application is successfully deployed and running at:
 
-**Live URL**: https://mixed-trixi-teledigitos-565be96c.koyeb.app
+**Live URL**: https://javaside.onrender.com
 
 ## Deployment Instructions
 
 Choose a platform from the list below and follow the corresponding guide for step-by-step deployment instructions.
 
-- **[Koyeb](./KOYEB.md)**: ✅ **Currently deployed**. This guide explains how to deploy the application using Docker and connect it to a Supabase database.
+- **[Render](./RENDER.md)**: ✅ **Currently deployed**. Complete guide with `render.yaml` configuration included. Supports automatic port detection and integrated PostgreSQL.
 
-- **[Render](./RENDER.md)**: ✅ **Ready to deploy**. Complete guide with `render.yaml` configuration included. Supports automatic port detection.
+- **[Koyeb](./KOYEB.md)**: ✅ **Previously deployed**. Alternative platform with excellent Docker support.
 
 ## Current Deployment Status
 
-- **Platform**: Koyeb
-- **Status**: ✅ Healthy and Running
-- **URL**: https://mixed-trixi-teledigitos-565be96c.koyeb.app
-- **Database**: Supabase PostgreSQL (external)
-- **Port**: 8000
+- **Platform**: Render
+- **Status**: ✅ Live and Running
+- **URL**: https://javaside.onrender.com
+- **Database**: Render PostgreSQL (internal network)
+- **Port**: Dynamic (via PORT env var)
 - **Container**: Docker with multi-stage build
 - **Frontend**: Vaadin production mode with pre-built bundle
+- **Auto-deploy**: Enabled from GitHub
 
 ---
 

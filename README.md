@@ -2,7 +2,9 @@
 
 Asistente automatizado que ayuda a usuarios de WhatsApp y Telegram a encontrar negocios, productos y servicios locales usando IA y fuentes verificadas.
 
-## 🚀 Estado Actual: PASO 2 COMPLETADO ✅ - Conexión a Supabase
+## 🚀 Estado Actual: DESPLEGADO EN PRODUCCIÓN ✅
+
+**Aplicación en vivo**: https://javaside.onrender.com
 
 Este proyecto se está desarrollando de forma **incremental**, paso por paso, probando cada funcionalidad antes de continuar.
 
@@ -10,10 +12,16 @@ Ver el plan completo en: [PLAN_INCREMENTAL.md](PLAN_INCREMENTAL.md)
 
 ## 📋 Requisitos
 
+### Desarrollo Local
 - Java 17 o superior
 - Maven 3.6+
-- Cuenta de Supabase (PostgreSQL)
-- Token de Telegram Bot
+- PostgreSQL (Supabase o Render)
+- Token de Telegram Bot (opcional)
+
+### Producción
+- Cuenta de Render (o plataforma compatible)
+- PostgreSQL database
+- GitHub repository
 
 ## ⚙️ Configuración
 
@@ -132,9 +140,18 @@ mvn clean
 
 ## 🚀 Despliegue (Deployment)
 
-Para instrucciones detalladas sobre cómo desplegar esta aplicación en la nube, consulta la guía en el directorio de despliegue:
+### Estado Actual
+- ✅ **Desplegado en Render**: https://javaside.onrender.com
+- ✅ **Base de datos**: Render PostgreSQL
+- ✅ **Auto-deploy**: Activado desde GitHub
+- ✅ **Estado**: Live y funcionando
 
-- **[Guía de Despliegue](./deployment/README.md)**
+### Guías de Despliegue
+Para instrucciones detalladas sobre cómo desplegar esta aplicación:
+
+- **[Guía de Render](./deployment/RENDER.md)** - ⭐ Recomendado (actualmente en uso)
+- **[Guía de Koyeb](./deployment/KOYEB.md)** - Alternativa
+- **[Comparación de Plataformas](./deployment/README_DEPLOY.md)**
 
 ## 📚 Documentación
 
@@ -175,5 +192,6 @@ Este proyecto es privado y está en desarrollo.
 ---
 
 **Versión**: 1.0.0  
-**Última actualización**: 2025-10-14  
-**Pasos completados**: 2/10
+**Última actualización**: 2025-10-19  
+**Pasos completados**: 2/10  
+**Estado**: ✅ Desplegado en producción (Render)
